@@ -1,10 +1,10 @@
 {
 	// dev container名(どこに使われてるかよくわかってない)
-	"name": "docker-playground - python",
+	"name": "api",
 	// 今回は docker-compose.ymlを利用する。全リポジトリ共通にしてます。
 	"dockerComposeFile": "docker-compose.yml",  
 	// docker-compose.yml内のサービス名を指定。全リポジトリ共通にしてます。
-	"service": "playground",
+	"service": "api",
 	// コンテナのどこにワークスペースを配置するかの指定。全リポジトリ共通にしてます。
 	"workspaceFolder": "/workspace",
 	// ゲストOSでの実行ユーザ。全リポジトリ共通にしてます。

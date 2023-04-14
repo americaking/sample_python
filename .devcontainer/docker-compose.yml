@@ -1,6 +1,6 @@
 version: '3'
 services:
-  playground:                 # `devcontainer.json`の'service'と一致させる
+  api:                 # `devcontainer.json`の'service'と一致させる
     container_name: 'python'  # コンテナ名
     hostname: 'python'        # ホスト名.ゲストOSのシェルに表示されるので指定している
 
