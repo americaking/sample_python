@@ -1,5 +1,6 @@
-from typing import Union
 from fastapi import FastAPI
+from model import TestUserTable
+from db import session
 
 app = FastAPI()
 
@@ -7,7 +8,8 @@ app = FastAPI()
 def read_root():
     return {"Hello": "World"}
 
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+#　ユーザー情報一覧取得
+@app.get("/test_users")
+def get_user_list():
+    users = session.query(TestUserTable).all()
+    return users
