@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 host = "db:3303"
 db_name = "sample_db"
 user = "mysqluser"
-password = "mysqlpass"
+password = "password"
 
 DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8' % (
     user,
@@ -14,6 +14,7 @@ DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8' % (
     db_name,
 )
 
+# DBとの接続
 ENGINE = create_engine(
     DATABASE,
     encoding="utf-8",

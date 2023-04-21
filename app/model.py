@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String
 from pydantic import BaseModel
-from db import Base
-from db import ENGINE
+from db2 import Base
+from db2 import ENGINE
 
 # テーブル定義
 class TestUserTable(Base):

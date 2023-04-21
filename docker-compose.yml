@@ -2,6 +2,9 @@ version: '3'
 
 services:
   app:
+    links:
+      - db
+    container_name: "api"
     build:
       context: .
       dockerfile: docker/app/Dockerfile
@@ -12,19 +15,20 @@ services:
       - pip-volume:/workspace/vendor
     command: 'uvicorn main:app --reload --host 0.0.0.0'
   db:
-      image: mysql:5.7
       container_name: db
       environment:
-        MYSQL_ROOT_PASSWORD: rootpass
         MYSQL_DATABASE: sample_db
         MYSQL_USER: mysqluser
-        MYSQL_PASSWORD: mysqlpass
+        MYSQL_PASSWORD: password
+        MYSQL_ROOT_PASSWORD: password
       volumes:
         - ./db/data:/var/lib/mysql
         - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
         - ./db/initdb.d:/docker-entrypoint-initdb.d
       ports:
         - 3303:3303
+      networks:
+      - local-net
       tty: true
 volumes:
   pip-volume:
