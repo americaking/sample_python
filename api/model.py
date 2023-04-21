@@ -1,24 +1,28 @@
+# -*- coding: utf-8 -*-
+# モデルの定義
 from sqlalchemy import Column, Integer, String
 from pydantic import BaseModel
 from db2 import Base
 from db2 import ENGINE
 
-# テーブル定義
-class TestUserTable(Base):
-    __tablename__ = 'test_user'
+
+# userテーブルのモデルUserTableを定義
+class UserTable(Base):
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(30), nullable=False)
-    email = Column(String(128), nullable=False)
+    age = Column(Integer)
 
-# モデル定義 
-class TestUser(BaseModel):
+
+# POSTやPUTのとき受け取るRequest Bodyのモデルを定義
+class User(BaseModel):
     id: int
     name: str
-    email: str
+    age: int
 
 
 def main():
-    # テーブル構築
+    # テーブルが存在しなければ、テーブルを作成
     Base.metadata.create_all(bind=ENGINE)
 
 

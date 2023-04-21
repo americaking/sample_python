@@ -1,34 +1,38 @@
 version: '3'
 
 services:
-  app:
+  db:
+    build: ./docker/db
+    container_name: db
+    restart: always
+    tty: true
+    environment:
+      MYSQL_DATABASE: sample_db
+      MYSQL_USER: mysqluser
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
+      - ./db/conf.d:/etc/mysql/conf.d 
+    ports:
+      - 3303:3303
+    networks:
+      - local-net
+  api:
+    # db起動後に立ち上げる
     links:
       - db
     container_name: "api"
-    build:
-      context: .
-      dockerfile: docker/app/Dockerfile
+    # path配下のDockerfile読み込み
+    build: ./docker/api
     ports:
-      - 8000:8000
+      - "8000:8000"
     volumes:
-      - .:/workspace:cached
-      - pip-volume:/workspace/vendor
-    command: 'uvicorn main:app --reload --host 0.0.0.0'
-  db:
-      container_name: db
-      environment:
-        MYSQL_DATABASE: sample_db
-        MYSQL_USER: mysqluser
-        MYSQL_PASSWORD: password
-        MYSQL_ROOT_PASSWORD: password
-      volumes:
-        - ./db/data:/var/lib/mysql
-        - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
-        - ./db/initdb.d:/docker-entrypoint-initdb.d
-      ports:
-        - 3303:3303
-      networks:
+      - .:/usr/src/server
+    networks:
       - local-net
-      tty: true
-volumes:
-  pip-volume:
+# コンテナ間で通信を行うためのネットワークブリッジ
+networks:
+  local-net:
+    driver: bridge
+

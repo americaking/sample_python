@@ -1,9 +1,9 @@
 {
-	"name": "app",
+	"name": "api",
 	"dockerComposeFile": ["../docker-compose.yml", "docker-compose.yml"],
-	"service": "app",
-	"workspaceFolder": "/workspace",
-	"runServices": ["app"],
+	"service": "api",
+	"workspaceFolder": "/usr/src/server",
+	"runServices": ["api"],
 	"settings": {
 	  "python.formatting.provider": "black"
 	},
