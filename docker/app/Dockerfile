@@ -10,5 +10,4 @@ WORKDIR /workspace
 
 COPY requirements.txt .
 
-RUN pip install -U pip \
-    && pip install --no-cache-dir --upgrade -r requirements.txt
+RUN pip install -r requirements.txt
