@@ -7,10 +7,10 @@ services:
     restart: always
     tty: true
     environment:
-      MYSQL_DATABASE: sample_db
-      MYSQL_USER: mysqluser
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: "sample_db"
+      MYSQL_USER: "mysqluser"
+      MYSQL_PASSWORD: "password"
+      MYSQL_ROOT_PASSWORD: "password"
     volumes:
       - ./db/initdb.d:/docker-entrypoint-initdb.d
       - ./db/conf.d:/etc/mysql/conf.d 
@@ -26,7 +26,7 @@ services:
     # path配下のDockerfile読み込み
     build: ./docker/api
     ports:
-      - "8000:8000"
+      - 127.0.0.1:8000:8000
     volumes:
       - .:/usr/src/server
     networks:
