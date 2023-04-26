@@ -1,6 +1,6 @@
 {
 	"name": "api",
-	"dockerComposeFile": ["../docker-compose.yml", "docker-compose.yml"],
+	"dockerComposeFile": ["../docker-compose.yml"],
 	"service": "api",
 	"workspaceFolder": "/usr/src/server",
 	"runServices": ["api"],
