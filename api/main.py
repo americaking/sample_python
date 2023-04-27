@@ -1,10 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, Form, UploadFile, HTTPException
+from fastapi.responses import FileResponse
 from typing import List  # ネストされたBodyを定義するために必要
 from starlette.middleware.cors import CORSMiddleware  # CORSを回避するために必要
 from model import UserTable
 from db2 import session
 import datetime
 import pytz
+import chardet
+import os
 
 app = FastAPI()
 
@@ -16,6 +19,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 @app.get("/")
 def read_root():
@@ -56,3 +61,53 @@ def get_country_from_timezone(timezone_offset):
         return country_name
     else:
         return None
+
+
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile = File(...)):
+    contents = await file.read()
+    # ファイルのエンコーディングを推測する
+    encoding = chardet.detect(contents)["encoding"]
+    # 推測されたエンコーディングでファイルを読み込む
+    contents = contents.decode(encoding)
+    # ファイルの内容を処理する
+    return {"filename": file.filename, "contents": contents}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.post("/uploadfiles/")
+async def create_upload_files(files: List[UploadFile] = File(...)):
+    results = []
+    for file in files:
+        filename = file.filename
+        if not allowed_file(filename):
+            results.append({"filename": filename, "status": "error", "message": "invalid file format"})
+        else:
+            contents = await file.read()
+            # ファイルの内容を処理する
+            results.append({"filename": filename, "status": "success"})
+    return results
+
+@app.post("/writefile/")
+async def write_file(file: UploadFile = File(...), text: str = Form(...)):
+    try:
+        with open(file.filename, "w", encoding="utf-8") as f:
+            f.write(text)
+    except Exception as e:
+        return {"filename": file.filename, "text": text, "status": "error", "message": str(e)}
+    else:
+        return {"filename": file.filename, "text": text, "status": "success"}
+    
+@app.get("/download/")
+async def download_file():
+    filename = "example.txt"
+    return FileResponse(filename)
+
+@app.get("/file_exists/")
+async def file_exists(filename: str):
+    if not os.path.exists(filename):
+        raise HTTPException(status_code=404, detail="File not found")
+    else:
+        return {"message": "File exists"}
