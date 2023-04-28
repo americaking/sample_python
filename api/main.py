@@ -4,12 +4,16 @@ from typing import List  # ネストされたBodyを定義するために必要
 from starlette.middleware.cors import CORSMiddleware  # CORSを回避するために必要
 from model import UserTable
 from db2 import session
+from scraper import Scraper
 import datetime
 import pytz
 import chardet
 import os
+import requests
+import bs4
 
 app = FastAPI()
+scraper = Scraper()
 
 # CORSを回避するために設定
 app.add_middleware(
@@ -111,3 +115,16 @@ async def file_exists(filename: str):
         raise HTTPException(status_code=404, detail="File not found")
     else:
         return {"message": "File exists"}
+    
+@app.get("/{word}")
+async def search_google(word):
+      return scraper.google_search(word)
+
+@app.get("/scrape/{url}")
+async def scrape(url: str):
+    response = requests.get(url)
+    soup = bs4(response.content, "html.parser")
+    # スクレイピングしたい処理を実装する
+    title = soup.find("title").text
+    return {"title": title}
+
