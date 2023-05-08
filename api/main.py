@@ -11,6 +11,9 @@ import chardet
 import os
 import requests
 import bs4
+from bs4 import BeautifulSoup
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 app = FastAPI()
 scraper = Scraper()
@@ -65,7 +68,24 @@ def get_country_from_timezone(timezone_offset):
         return country_name
     else:
         return None
+    
+def getTitle(url):
+    try:
+        html = urlopen(url)
+    except HTTPError as e:
+        return None
+    try:
+        bs = BeautifulSoup(html.read(), "html.parser")
+        title = bs.body.h1
+    except AttributeError as e:
+        return None
+    return title
 
+def scrape_data(url: str):
+    # テキストファイルに書き出す
+    with open("scraped_data.txt", "w", encoding="utf-8") as file:
+        file.write(getTitle(url))
+    return 
 
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
@@ -128,3 +148,6 @@ async def scrape(url: str):
     title = soup.find("title").text
     return {"title": title}
 
+@app.get("/scrape_output/{url}")
+async def scrape_output(url: str):
+    return scrape_data(url)
