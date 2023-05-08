@@ -70,22 +70,37 @@ def get_country_from_timezone(timezone_offset):
         return None
     
 def getTitle(url):
-    try:
-        html = urlopen(url)
-    except HTTPError as e:
-        return None
-    try:
-        bs = BeautifulSoup(html.read(), "html.parser")
-        title = bs.body.h1
-    except AttributeError as e:
-        return None
-    return title
+    # URLからHTMLを取得
+    response = requests.get(url)
+
+    # レスポンスのステータスコードを確認
+    if response.status_code == 200:
+        html = response.text
+
+        # BeautifulSoupを使ってHTMLを解析
+        soup = BeautifulSoup(html, "html.parser")
+
+        # データを抽出する処理（ここでは例としてタイトルを取得）
+        title_element = soup.title
+
+        # タイトル要素が存在するかチェック
+        if title_element:
+            title = title_element.string
+
+            # テキストファイルに書き出す
+            with open("./usr/src/server/scraped_data.txt", "w", encoding="utf-8") as file:
+                file.write(title)
+        else:
+            print("タイトル要素が見つかりませんでした。")
+    else:
+        print("URLへのアクセスが失敗しました。ステータスコード:", response.status_code)
 
 def scrape_data(url: str):
     # テキストファイルに書き出す
-    with open("scraped_data.txt", "w", encoding="utf-8") as file:
-        file.write(getTitle(url))
-    return 
+    # with open("scraped_data.txt", "w", encoding="utf-8") as file:
+    #     file.write(getTitle(url))
+    # return 
+    return getTitle(url)
 
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
@@ -148,6 +163,34 @@ async def scrape(url: str):
     title = soup.find("title").text
     return {"title": title}
 
-@app.get("/scrape_output/{url}")
-async def scrape_output(url: str):
-    return scrape_data(url)
+@app.get("/scrape_output")
+async def scrape_output():
+    # スクレイピング対象のURL
+    url = "https://example.com"
+
+    # URLからHTMLを取得
+    response = requests.get(url)
+
+    # レスポンスのステータスコードを確認
+    if response.status_code == 200:
+        html = response.text
+
+        # BeautifulSoupを使ってHTMLを解析
+        soup = BeautifulSoup(html, "html.parser")
+
+        # データを抽出する処理（ここでは例としてタイトルを取得）
+        title_element = soup.title
+
+        # タイトル要素が存在するかチェック
+        if title_element:
+            title = title_element.string
+
+            # テキストファイルに書き出す
+            with open("/api/scraped_data.txt", "w", encoding="utf-8") as file:
+                file.write(title)
+
+            return {"message": "スクレイピングが成功し、データをファイルに保存しました。"}
+        else:
+            return {"message": "タイトル要素が見つかりませんでした。"}
+    else:
+        return {"message": f"URLへのアクセスが失敗しました。ステータスコード: {response.status_code}"}
