@@ -153,7 +153,10 @@ async def file_exists(filename: str):
 async def scrape():
     url = "https://example.com"
     response = requests.get(url)
-    soup = bs4(response.content, "html.parser")
+    html = response.text
+
+    # BeautifulSoupを使ってHTMLを解析
+    soup = BeautifulSoup(html, "html.parser")
     # スクレイピングしたい処理を実装する
     title = soup.find("title").text
     return {"title": title}
@@ -181,7 +184,7 @@ async def scrape_output():
             title = title_element.string
 
             # テキストファイルに書き出す
-            with open("/api/scraped_data.txt", "w", encoding="utf-8") as file:
+            with open("scraped_data.txt", "w", encoding="utf-8") as file:
                 file.write(title)
 
             return {"message": "スクレイピングが成功し、データをファイルに保存しました。"}
