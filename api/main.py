@@ -4,7 +4,7 @@ from typing import List  # ネストされたBodyを定義するために必要
 from starlette.middleware.cors import CORSMiddleware  # CORSを回避するために必要
 from model import UserTable
 from db2 import session
-import datetime
+from datetime import datetime
 import pytz
 import chardet
 import os
@@ -192,3 +192,14 @@ async def scrape_output():
             return {"message": "タイトル要素が見つかりませんでした。"}
     else:
         return {"message": f"URLへのアクセスが失敗しました。ステータスコード: {response.status_code}"}
+
+@app.get("/watch")
+def start_watch():
+    start_time = datetime.now()
+    return {"message": "タイムウォッチャーを開始しました。", "start_time": start_time}
+
+@app.get("/watch/{start_time}")
+def stop_watch(start_time: datetime):
+    end_time = datetime.now()
+    elapsed_time = end_time - start_time
+    return {"message": "タイムウォッチャーを終了しました。", "start_time": start_time, "end_time": end_time, "elapsed_time": elapsed_time}
